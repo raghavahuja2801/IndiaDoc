@@ -41,7 +41,7 @@ Global Health Platform aims to break down geographical and financial barriers to
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/GlobalHealthPlatform.git
+   git clone https://github.com/raghavahuja2801/GlobalHealthPlatform.git
    cd GlobalHealthPlatform
    ```
 
