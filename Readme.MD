@@ -48,14 +48,14 @@ Global Health Platform aims to break down geographical and financial barriers to
 Configure environment variables for backend (MongoDB URI, Zoom API keys, etc.)
 
 Run the backend server:
-```bash
-npm start
-```
+    ```bash
+    npm start
+    ```
 Run the frontend server:
-```bash
-cd ../frontend
-npm start
-```
+    ```bash
+    cd ../frontend
+    npm start
+    ```
 
 
 
