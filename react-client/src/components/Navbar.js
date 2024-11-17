@@ -13,9 +13,12 @@ export default function Navbar() {
 
   return (
     <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-200">
+      {/* Logo */}
       <Link to="/" className="flex items-center justify-center">
         <span className="text-2xl font-bold text-green-600">GlobalHealth</span>
       </Link>
+
+      {/* Navigation Links */}
       <nav className="ml-auto flex gap-4 sm:gap-6">
         <Link
           to="/how-it-works"
@@ -42,14 +45,19 @@ export default function Navbar() {
           Contact
         </Link>
 
-        {/* Log In / Log Out Button */}
+        {/* Conditional Login/Logout Button */}
         {user ? (
-          <button
-            onClick={handleLogout}
-            className="text-sm font-medium hover:text-orange-500 transition-colors"
-          >
-            Log Out
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">
+              Welcome, {user.name}!
+            </span>
+            <button
+              onClick={handleLogout}
+              className="text-sm font-medium text-red-600 hover:text-red-800 transition-colors"
+            >
+              Log Out
+            </button>
+          </div>
         ) : (
           <Link
             to="/auth"
