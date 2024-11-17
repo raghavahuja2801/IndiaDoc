@@ -28,3 +28,19 @@ exports.addDoctor = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get doctors by specialization
+exports.getDoctorsBySpecialization = async (req, res) => {
+  const { specialization } = req.query; // Get specialization from query parameters
+  try {
+    if (!specialization) {
+      return res.status(400).json({ error: "Specialization is required" });
+    }
+    // Find doctors matching the specialization and populate the 'user' field
+    const doctors = await Doctor.find({ specialization }).populate("user");
+    res.json(doctors); // Return the filtered doctors
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};

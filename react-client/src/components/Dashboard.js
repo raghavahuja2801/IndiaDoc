@@ -1,30 +1,96 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../context/authContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { useAuth } from "../context/authContext"; // Import the Auth context
 
-export default function HomePage() {
-  const [selectedSpecialty, setSelectedSpecialty] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const { user, logout } = useAuth(); // Access the user state and logout function
-  const handleBooking = (e) => {
-    e.preventDefault();
-    console.log("Booking:", { selectedSpecialty, selectedDate, selectedTime });
-    alert("Consultation booked successfully!");
+export default function Dashboard() {
+  const [specialization, setSpecialization] = useState(""); // Selected specialization
+  const [doctors, setDoctors] = useState([]); // Doctors data
+  const [error, setError] = useState(null); // Error state
+  const [selectedDoctor, setSelectedDoctor] = useState(""); // Selected doctor
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(""); // Selected time slot
+  const [successMessage, setSuccessMessage] = useState(""); // Appointment confirmation message
+  const { user } = useAuth(); // Access user details from Auth Context
+
+  // Fetch doctors based on specialization
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      if (!specialization) {
+        setDoctors([]); // Reset doctors list if no specialization is selected
+        return;
+      }
+
+      try {
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Make the GET request with token in the Authorization header
+        const response = await axios.get(
+          "http://localhost:5001/api/doctors/specialization",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in header
+            },
+            params: { specialization }, // Pass specialization as query parameter
+          }
+        );
+        setDoctors(response.data); // Update doctors list
+        setError(null); // Clear any errors
+        console.log("Doctors:", response.data);
+      } catch (err) {
+        setError("Failed to fetch doctors. Please try again.");
+        console.error(err);
+        setDoctors([]); // Reset doctors list on error
+      }
+    };
+
+    fetchDoctors();
+  }, [specialization]); // Re-fetch doctors whenever the specialization changes
+
+  const handleBooking = async () => {
+    if (!selectedDoctor || !selectedTimeSlot) {
+      setError("Please select a doctor and a time slot."); // Error if required fields are missing
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token"); // Retrieve token from local storage
+
+      // Construct the appointment data
+      const appointmentData = {
+        patient: user._id, // Replace with the logged-in user's ID
+        doctor: selectedDoctor,
+        date: selectedTimeSlot, // Assuming selectedTimeSlot contains the date and time
+      };
+
+      // Send POST request to create an appointment
+      const response = await axios.post(
+        "http://localhost:5001/api/appointments",
+        appointmentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add Authorization header with the token
+          },
+        }
+      );
+
+      setSuccessMessage(response.data.message); // Display success message
+      setError(null); // Clear any errors
+      console.log("Appointment created:", response.data.appointment);
+    } catch (err) {
+      setError("Failed to book the appointment. Please try again."); // Handle errors
+      console.error(err);
+    }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Header */}
       <Navbar />
-
-      {/* Main Content */}
       <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-green-800 mb-6">
-            Welcome back, {user.name}!
+            Doctor Dashboard
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Booking Section */}
@@ -32,126 +98,122 @@ export default function HomePage() {
               <h2 className="text-2xl font-semibold text-green-700 mb-4">
                 Book a Consultation
               </h2>
-              <form onSubmit={handleBooking} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="specialty"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Select Specialty
-                  </label>
-                  <select
-                    id="specialty"
-                    value={selectedSpecialty}
-                    onChange={(e) => setSelectedSpecialty(e.target.value)}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                    required
-                  >
-                    <option value="">Choose a specialty</option>
-                    <option value="general">General Practitioner</option>
-                    <option value="cardiology">Cardiology</option>
-                    <option value="dermatology">Dermatology</option>
-                    <option value="neurology">Neurology</option>
-                    <option value="pediatrics">Pediatrics</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="date"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Select Date
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="time"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Select Time
-                  </label>
-                  <select
-                    id="time"
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
-                    required
-                  >
-                    <option value="">Choose a time</option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
-                  </select>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+
+              {/* Specialization Dropdown */}
+              <div className="mb-4">
+                <label
+                  htmlFor="specialization"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  Book Consultation
-                </button>
-              </form>
+                  Select Specialization
+                </label>
+                <select
+                  id="specialization"
+                  value={specialization}
+                  onChange={(e) => setSpecialization(e.target.value)}
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                >
+                  <option value="">Choose a specialization</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Dermatologist">Dermatology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="General Practitioner">
+                    General Practitioner
+                  </option>
+                </select>
+              </div>
+
+              {/* Doctors List */}
+              <div>
+                {error && <p className="text-red-500">{error}</p>}
+                {successMessage && (
+                  <p className="text-green-500">{successMessage}</p>
+                )}
+                {doctors.length > 0 ? (
+                  <ul className="divide-y divide-gray-200">
+                    {doctors.map((doctor) => (
+                      <li key={doctor._id} className="py-4">
+                        <p className="text-lg font-semibold text-green-700">
+                          {doctor.user.name} ({doctor.specialization})
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {doctor.user.email}
+                        </p>
+                        <label
+                          htmlFor={`doctor-${doctor._id}`}
+                          className="block text-sm font-medium text-gray-700 mt-2"
+                        >
+                          Select Time Slot
+                        </label>
+                        <select
+                          id={`doctor-${doctor._id}`}
+                          onChange={(e) => {
+                            setSelectedDoctor(doctor._id);
+                            setSelectedTimeSlot(e.target.value);
+                          }}
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                        >
+                          <option value="">Choose a time slot</option>
+                          {doctor.availableHours.map((slot) => (
+                            <option
+                              key={slot._id}
+                              value={`${slot.start}-${slot.end}`}
+                            >
+                              {slot.start} - {slot.end}
+                            </option>
+                          ))}
+                        </select>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">
+                    No doctors available for the selected specialization.
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={handleBooking}
+                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Confirm Appointment
+              </button>
             </div>
 
             {/* Sidebar Section */}
             <div className="space-y-6">
-              {/* Quick Actions */}
               <div className="bg-orange-50 p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold text-orange-800 mb-2">
                   Quick Actions
                 </h2>
                 <ul className="space-y-2">
                   <li>
-                    <Link
-                      to="/consultations"
-                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    <a
+                      href="/consultations"
+                      className="text-orange-600 hover:text-orange-800"
                     >
                       View Upcoming Consultations
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      to="/orders"
-                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    <a
+                      href="/orders"
+                      className="text-orange-600 hover:text-orange-800"
                     >
                       Order Medicines
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      to="/resources"
-                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    <a
+                      href="/resources"
+                      className="text-orange-600 hover:text-orange-800"
                     >
                       Health Resources
-                    </Link>
+                    </a>
                   </li>
                 </ul>
-              </div>
-
-              {/* Health Summary */}
-              <div className="bg-green-50 p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-green-800 mb-2">
-                  Your Health Summary
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Last check-up: 3 months ago
-                </p>
-                <Link
-                  to="/health-record"
-                  className="text-green-600 hover:text-green-800 font-medium"
-                >
-                  View Full Health Record →
-                </Link>
               </div>
             </div>
           </div>
