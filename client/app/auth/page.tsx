@@ -1,41 +1,37 @@
-'use client';
-import { useState } from 'react'
-import axios from 'axios';  // Import axios
-import Link from "next/link"
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+"use client";
+import { useState } from "react";
+import { useAuth } from "../../context/authContext"; // Import the useAuth hook
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function LoginSignup() {
+  const { login, register, error, setError, user } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const toggleForm = () => setIsLogin(!isLogin);
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+    setError(null); // Clear errors when toggling forms
+  };
 
-  // Handle sign-up request
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Clear any previous errors
 
-    // Form data
-    const formData = {
-      name,
-      email,
-      password,
-      confirmPassword,
-      role: "patient"
-    };
-
-    // Send the request to your backend using Axios
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/register', formData);
-      console.log('Sign up successful:', response.data);
-      // You can handle successful registration, like redirecting to login
+      if (isLogin) {
+        await login(email, password);
+        console.log("Sign in successful");
+        console.log("User:", user);
+      } else {
+        await register({ name, email, password, role: "patient" });
+        console.log("Sign up successful");
+      }
     } catch (err) {
-      console.error('Error during sign up:', err);
-      setError('Failed to sign up. Please try again.');
+      console.error("Authentication error:", err);
     }
   };
 
@@ -46,12 +42,17 @@ export default function LoginSignup() {
         <div className="max-w-md w-full space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-green-800">
-              {isLogin ? 'Sign in to your account' : 'Create your account'}
+              {isLogin ? "Sign in to your account" : "Create your account"}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Or{' '}
-              <button onClick={toggleForm} className="font-medium text-orange-600 hover:text-orange-500">
-                {isLogin ? 'create a new account' : 'sign in to your existing account'}
+              Or{" "}
+              <button
+                onClick={toggleForm}
+                className="font-medium text-orange-600 hover:text-orange-500"
+              >
+                {isLogin
+                  ? "create a new account"
+                  : "sign in to your existing account"}
               </button>
             </p>
           </div>
@@ -133,7 +134,7 @@ export default function LoginSignup() {
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
-                {isLogin ? 'Sign in' : 'Sign up'}
+                {isLogin ? "Sign in" : "Sign up"}
               </button>
             </div>
           </form>
