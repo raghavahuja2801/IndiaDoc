@@ -1,82 +1,71 @@
-"use client";
+"use client"; // Ensure this is the first line
 
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import { useRouter } from "next/router";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // Add a loading state for initialization
+  const [loading, setLoading] = useState(true); // Loading state to block rendering during initialization
+  const router = useRouter();
 
-  // Function to validate the token and fetch the user
-  const initializeUser = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const response = await axios.get("http://localhost:5001/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(response.data); // Set the user data
-      } catch (err) {
-        console.error("Token validation failed:", err);
-        localStorage.removeItem("token"); // Clear invalid token
-      }
+  // Simplified initializeUser function
+  const initializeUser = () => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // Set the user if it exists in localStorage
+    } else {
+      setUser(null); // Ensure user is null if no stored user is found
     }
     setLoading(false); // Finish initialization
   };
 
   // Initialize user on app load
   useEffect(() => {
-    initializeUser(); // Run only on mount
-  }, []); // Fix: Empty dependency array to prevent unnecessary re-runs
+    if (typeof window !== "undefined") {
+      initializeUser(); // Only run on the client-side
+    }
+  }, []); // Run only on mount
 
+  // Login function
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/login",
-        { email, password }
-      );
-      setUser(response.data.user); // Update user state
-      localStorage.setItem("token", response.data.token); // Save token
-      setError(null); // Clear any previous errors
+      // Replace this with your API call
+      const mockResponse = { id: 1, name: "John Doe", email }; // Mock user data
+      localStorage.setItem("user", JSON.stringify(mockResponse)); // Save user to localStorage
+      setUser(mockResponse); // Set user state
+      router.push("/dashboard"); // Redirect to the dashboard after login
     } catch (err) {
-      setError("Invalid login credentials. Please try again.");
+      console.error("Login failed:", err);
       throw err;
     }
   };
 
-  const register = async ({ name, email, password, role }) => {
+  // Register function
+  const register = async ({ name, email, password }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/register",
-        {
-          name,
-          email,
-          password,
-          role,
-        }
-      );
-      setUser(response.data.user); // Update user state
-      localStorage.setItem("token", response.data.token); // Save token
-      setError(null); // Clear any previous errors
+      // Replace this with your API call
+      const mockResponse = { id: 2, name, email }; // Mock user data
+      localStorage.setItem("user", JSON.stringify(mockResponse)); // Save user to localStorage
+      setUser(mockResponse); // Set user state
+      router.push("/dashboard"); // Redirect to the dashboard after registration
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      console.error("Registration failed:", err);
       throw err;
     }
   };
 
+  // Logout function
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("token"); // Clear token
+    setUser(null); // Clear user state
+    localStorage.removeItem("user"); // Remove user from localStorage
+    router.push("/login"); // Redirect to login page
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, error, setError, login, register, logout, loading }}
-    >
-      {children}
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {!loading && children} {/* Block rendering until initialization is complete */}
     </AuthContext.Provider>
   );
 };

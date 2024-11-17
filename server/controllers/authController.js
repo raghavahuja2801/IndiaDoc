@@ -38,6 +38,7 @@ exports.login = async (req, res) => {
     );
     res.json({ token });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 };
@@ -51,6 +52,7 @@ exports.getMe = async (req, res) => {
     console.log(user);
     res.json(user);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 };
