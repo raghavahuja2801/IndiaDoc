@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
+import { useAuth } from "../context/authContext"; // Import the Auth context
 
 export default function HomePage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-
+  const { user, logout } = useAuth(); // Access the user state and logout function
   const handleBooking = (e) => {
     e.preventDefault();
     console.log("Booking:", { selectedSpecialty, selectedDate, selectedTime });
@@ -16,19 +18,26 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
- <Navbar />
+      <Navbar />
 
       {/* Main Content */}
       <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-green-800 mb-6">Welcome back, User!</h1>
+          <h1 className="text-3xl font-bold text-green-800 mb-6">
+            Welcome back, {user.name}!
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Booking Section */}
             <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold text-green-700 mb-4">Book a Consultation</h2>
+              <h2 className="text-2xl font-semibold text-green-700 mb-4">
+                Book a Consultation
+              </h2>
               <form onSubmit={handleBooking} className="space-y-4">
                 <div>
-                  <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="specialty"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Select Specialty
                   </label>
                   <select
@@ -47,7 +56,10 @@ export default function HomePage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="date"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Select Date
                   </label>
                   <input
@@ -60,7 +72,10 @@ export default function HomePage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="time"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Select Time
                   </label>
                   <select
@@ -92,20 +107,31 @@ export default function HomePage() {
             <div className="space-y-6">
               {/* Quick Actions */}
               <div className="bg-orange-50 p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-orange-800 mb-2">Quick Actions</h2>
+                <h2 className="text-xl font-semibold text-orange-800 mb-2">
+                  Quick Actions
+                </h2>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/consultations" className="text-orange-600 hover:text-orange-800 flex items-center">
+                    <Link
+                      to="/consultations"
+                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    >
                       View Upcoming Consultations
                     </Link>
                   </li>
                   <li>
-                    <Link to="/orders" className="text-orange-600 hover:text-orange-800 flex items-center">
+                    <Link
+                      to="/orders"
+                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    >
                       Order Medicines
                     </Link>
                   </li>
                   <li>
-                    <Link to="/resources" className="text-orange-600 hover:text-orange-800 flex items-center">
+                    <Link
+                      to="/resources"
+                      className="text-orange-600 hover:text-orange-800 flex items-center"
+                    >
                       Health Resources
                     </Link>
                   </li>
@@ -114,9 +140,16 @@ export default function HomePage() {
 
               {/* Health Summary */}
               <div className="bg-green-50 p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold text-green-800 mb-2">Your Health Summary</h2>
-                <p className="text-gray-600 mb-4">Last check-up: 3 months ago</p>
-                <Link to="/health-record" className="text-green-600 hover:text-green-800 font-medium">
+                <h2 className="text-xl font-semibold text-green-800 mb-2">
+                  Your Health Summary
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Last check-up: 3 months ago
+                </p>
+                <Link
+                  to="/health-record"
+                  className="text-green-600 hover:text-green-800 font-medium"
+                >
                   View Full Health Record →
                 </Link>
               </div>
@@ -124,19 +157,7 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t border-gray-200">
-        <p className="text-xs text-gray-600">© 2023 GlobalHealth. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4 text-gray-600 hover:text-orange-500" to="/terms">
-            Terms of Service
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4 text-gray-600 hover:text-orange-500" to="/privacy">
-            Privacy
-          </Link>
-        </nav>
-      </footer>
+      <Footer />
     </div>
   );
 }

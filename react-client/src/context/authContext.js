@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
 const AuthContext = createContext(null);
@@ -35,10 +35,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/auth/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:5001/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
       const { token } = response.data; // Extract the token from the response
       localStorage.setItem("token", token); // Save the token to localStorage
@@ -51,14 +54,17 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async ({ name, email, password }) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/auth/register", {
-        name,
-        email,
-        password,
-        role: "patient"
-      });
-      login(email, password)
-      console.log("signed in")
+      const response = await axios.post(
+        "http://localhost:5001/api/auth/register",
+        {
+          name,
+          email,
+          password,
+          role: "patient",
+        }
+      );
+      login(email, password);
+      console.log("signed in");
     } catch (err) {
       console.log("Registration failed:", err.response?.data || err.message);
     }
@@ -72,7 +78,8 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {!loading && children} {/* Block rendering until initialization is complete */}
+      {!loading && children}{" "}
+      {/* Block rendering until initialization is complete */}
     </AuthContext.Provider>
   );
 };
