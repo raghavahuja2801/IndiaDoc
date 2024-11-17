@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function LoginSignup() {
-  const { login, register, error, setError, user } = useAuth(); // Access Auth Context functions
+  const { login, register, user } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +28,6 @@ export default function LoginSignup() {
         navigate("/dashboard"); // Navigate to dashboard on successful login
       } else {
         if (password !== confirmPassword) {
-          setError("Passwords do not match.");
           return;
         }
         await register({ name, email, password, role: "patient" });
@@ -38,6 +37,10 @@ export default function LoginSignup() {
       console.error("Authentication error:", err);
     }
   };
+
+  if(user){
+    navigate('/dashboard')
+  }else{
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -142,11 +145,10 @@ export default function LoginSignup() {
               </button>
             </div>
           </form>
-
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
         </div>
       </main>
       <Footer />
     </div>
   );
+}
 }

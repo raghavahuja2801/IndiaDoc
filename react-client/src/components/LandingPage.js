@@ -2,12 +2,19 @@ import React from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
+import {useAuth} from "../context/authContext"
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const {user} = useAuth();
 
   const handleConsultDoctorClick = () => {
+    if(user){
+      navigate('/dashboard')
+
+    }else{
     navigate("/auth"); // Navigate to the auth page
+    }
   };
 
   return (

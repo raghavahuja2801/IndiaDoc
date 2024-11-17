@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect} from "react";
 import axios from "axios";
 
 const AuthContext = createContext(null);
@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }) => {
     initializeUser(); // Only run on mount
   }, []);
 
-  // Login function
   const login = async (email, password) => {
     try {
       const response = await axios.post("http://localhost:5001/api/auth/login", {
@@ -45,8 +44,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token); // Save the token to localStorage
       await fetchUser(token); // Fetch user details
     } catch (err) {
-      console.error("Login failed:", err.response?.data || err.message);
-      throw new Error(err.response?.data?.message || "Login failed. Please try again.");
+      console.log("Login failed:", err.response?.data || err.message);
     }
   };
 
@@ -59,12 +57,10 @@ export const AuthProvider = ({ children }) => {
         password,
         role: "patient"
       });
-
-      const { token } = response.data; // Extract the token from the response
+      login(email, password)
       console.log("signed in")
     } catch (err) {
-      console.error("Registration failed:", err.response?.data || err.message);
-      throw new Error(err.response?.data?.message || "Registration failed. Please try again.");
+      console.log("Registration failed:", err.response?.data || err.message);
     }
   };
 
