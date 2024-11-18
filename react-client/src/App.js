@@ -7,6 +7,7 @@ import HowItWorks from "./components/HowItWorks";
 import Services from "./components/Services";
 import DoctorOnboarding from "./components/Doctor-Onboarding";
 import About from "./components/About";
+import ContactPage from "./components/ContactPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
     </Router>
   );
