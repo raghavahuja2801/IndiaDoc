@@ -1,28 +1,38 @@
 import React, { useState } from "react";
-import Navbar from "./Navbar"; // Import Navbar component
-import Footer from "./Footer"; // Import Footer component
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const ContactPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [notification, setNotification] = useState(false); // Notification state
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic (e.g., send to backend)
-    console.log("Form submitted:", { name, email, message });
-
-    // Display a simple success message
-    alert(
-      "Message sent! We've received your message and will get back to you soon."
-    );
-
-    // Reset the form fields
-    setName("");
-    setEmail("");
-    setMessage("");
+  
+    try {
+      const response = await fetch("http://localhost:5001/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+  
+      if (response.ok) {
+        setNotification(true); // Show success notification
+        setTimeout(() => setNotification(false), 5000); // Hide notification after 5 seconds
+        setName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        console.error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
@@ -33,12 +43,9 @@ const ContactPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-              Contact Us
-            </h1>
+            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">Contact Us</h1>
             <p className="mt-4 text-xl text-gray-600">
-              We're here to help. Reach out to us with any questions or
-              concerns.
+              We're here to help. Reach out to us with any questions or concerns.
             </p>
           </div>
 
@@ -46,15 +53,10 @@ const ContactPage = () => {
           <div className="grid md:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div className="bg-white shadow-lg rounded-lg p-6">
-              <h2 className="text-2xl font-semibold text-green-600 mb-4">
-                Send us a message
-              </h2>
+              <h2 className="text-2xl font-semibold text-green-600 mb-4">Send us a message</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                     Name
                   </label>
                   <input
@@ -67,10 +69,7 @@ const ContactPage = () => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email
                   </label>
                   <input
@@ -83,10 +82,7 @@ const ContactPage = () => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">
                     Message
                   </label>
                   <textarea
@@ -109,9 +105,7 @@ const ContactPage = () => {
 
             {/* Contact Information */}
             <div className="bg-white shadow-lg rounded-lg p-6">
-              <h2 className="text-2xl font-semibold text-green-600 mb-4">
-                Contact Information
-              </h2>
+              <h2 className="text-2xl font-semibold text-green-600 mb-4">Contact Information</h2>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <span className="h-6 w-6 text-orange-500">📍</span>
@@ -126,18 +120,23 @@ const ContactPage = () => {
                   <span>support@healthcareplatform.com</span>
                 </div>
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Office Hours
-                  </h3>
-                  <p className="text-gray-600">
-                    Monday - Friday: 9:00 AM - 5:00 PM
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Office Hours</h3>
+                  <p className="text-gray-600">Monday - Friday: 9:00 AM - 5:00 PM</p>
                   <p className="text-gray-600">Saturday: 10:00 AM - 2:00 PM</p>
                   <p className="text-gray-600">Sunday: Closed</p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Notification */}
+          {notification && (
+            <div className="mt-8 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow">
+              <p className="text-center">
+                Message sent! Thank you, we'll get back to you as soon as possible.
+              </p>
+            </div>
+          )}
         </div>
       </main>
 
