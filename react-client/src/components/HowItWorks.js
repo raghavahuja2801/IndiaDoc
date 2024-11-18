@@ -66,7 +66,7 @@ export default function HowItWorks() {
           <div className="mt-16 text-center">
             <h3 className="text-2xl font-bold text-green-800 mb-4">Ready to Get Started?</h3>
             <Link
-              href="/signup"
+              to="/auth"
               className="inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-md hover:bg-orange-600 transition-colors duration-300"
             >
               Sign Up Now

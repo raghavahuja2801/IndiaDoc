@@ -11,6 +11,7 @@ export default function LoginSignup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("patient"); // Role state (patient/doctor)
   const navigate = useNavigate(); // Use navigate for programmatic navigation
 
   const toggleForm = () => {
@@ -22,17 +23,26 @@ export default function LoginSignup() {
 
     try {
       if (isLogin) {
-        await login(email, password);
-        console.log("Sign in successful");
-        console.log("User:", user);
+        const data = await login(email, password);
+        if (data.role == "patient"){
+          navigate("/dashboard")
+        }
+        else{
+          navigate("/doctor-dashboard")
+        }
       } else {
         if (password !== confirmPassword) {
           return;
         }
-        await register({ name, email, password });
+        await register({ name, email, password, role });
         console.log("Sign up successful");
+        if(role == "patient"){
+          navigate("/dashboard"); // Navigate to dashboard on successful login
+          }else{
+            navigate("/doctor-onboard")
+          }
       }
-      navigate("/dashboard"); // Navigate to dashboard on successful login
+      
     } catch (err) {
       console.error("Authentication error:", err);
     }
@@ -117,22 +127,39 @@ export default function LoginSignup() {
               </div>
 
               {!isLogin && (
-                <div>
-                  <label htmlFor="confirm-password" className="sr-only">
-                    Confirm Password
-                  </label>
-                  <input
-                    id="confirm-password"
-                    name="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
-                    required
-                    className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                    placeholder="Confirm Password"
-                  />
-                </div>
+                <>
+                  <div>
+                    <label htmlFor="confirm-password" className="sr-only">
+                      Confirm Password
+                    </label>
+                    <input
+                      id="confirm-password"
+                      name="confirm-password"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      required
+                      className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                      placeholder="Confirm Password"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                      Sign up as
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    >
+                      <option value="patient">Patient</option>
+                      <option value="doctor">Doctor</option>
+                    </select>
+                  </div>
+                </>
               )}
 
               <div>
