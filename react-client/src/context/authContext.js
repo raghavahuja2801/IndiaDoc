@@ -46,13 +46,14 @@ export const AuthProvider = ({ children }) => {
       const { token } = response.data; // Extract the token from the response
       localStorage.setItem("token", token); // Save the token to localStorage
       await fetchUser(token); // Fetch user details
+      return user;
     } catch (err) {
       console.log("Login failed:", err.response?.data || err.message);
     }
   };
 
   // Register function
-  const register = async ({ name, email, password }) => {
+  const register = async ({ name, email, password, role }) => {
     try {
       const response = await axios.post(
         "http://localhost:5001/api/auth/register",
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
           name,
           email,
           password,
-          role: "patient",
+          role,
         }
       );
       login(email, password);
