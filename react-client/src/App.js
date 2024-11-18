@@ -4,6 +4,7 @@ import LandingPage from "./components/LandingPage"
 import LoginSignup from "./components/Auth";
 import HomePage from "./components/Dashboard";
 import HowItWorks from "./components/HowItWorks";
+import Services from "./components/Services";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/auth" element={<LoginSignup />} />
         <Route path="/dashboard" element={<HomePage />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/services" element={<Services />} />
       </Routes>
     </Router>
   );
