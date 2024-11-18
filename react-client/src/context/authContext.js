@@ -17,7 +17,9 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get("http://localhost:5001/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(response.data.role);
       setUser(response.data); // Set user details from the response
+      return response.data.role; 
     } catch (err) {
       console.error("Failed to fetch user:", err.response?.data || err.message);
       logout(); // Clear user state if fetching user fails
@@ -49,8 +51,8 @@ export const AuthProvider = ({ children }) => {
 
       const { token } = response.data; // Extract the token from the response
       localStorage.setItem("token", token); // Save the token to localStorage
-      await fetchUser(token); // Fetch user details
-      return user;
+      const role = await fetchUser(token); // Fetch user details
+      return role;
     } catch (err) {
       console.log("Login failed:", err.response?.data || err.message);
     }
@@ -59,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async ({ name, email, password, role }) => {
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5001/api/auth/register",
         {
           name,

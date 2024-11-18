@@ -23,8 +23,9 @@ export default function LoginSignup() {
 
     try {
       if (isLogin) {
-        const data = await login(email, password);
-        if (data.role == "patient"){
+        const login_role = await login(email, password);
+        console.log(login_role)
+        if (login_role == "patient"){
           navigate("/dashboard")
         }
         else{
