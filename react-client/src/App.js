@@ -6,6 +6,7 @@ import HomePage from "./components/Dashboard";
 import HowItWorks from "./components/HowItWorks";
 import Services from "./components/Services";
 import DoctorOnboarding from "./components/Doctor-Onboarding";
+import About from "./components/About";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </Router>
   );
