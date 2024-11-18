@@ -1,3 +1,7 @@
+// This file contains the AuthContext and AuthProvider components which are used to manage the user authentication state.
+// This is basically used so that the user can login and register and the user details are stored in the context and can be accessed from any component.
+
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -28,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false); // Finish initialization
   };
-
+  // when ever you go to the website the user will be checked if the user is logged in or not
   useEffect(() => {
     initializeUser(); // Only run on mount
   }, []);

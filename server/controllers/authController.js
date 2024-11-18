@@ -45,6 +45,7 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
+    // req.user is populated by the auth middleware after token verification so the front end sends us the token and we send that to the middle wear to get user data in req.user and then we send back the user data
     const user = await User.findById(req.user.id).select("-password"); // Exclude the password
     if (!user) {
       return res.status(404).json({ message: "User not found" });
