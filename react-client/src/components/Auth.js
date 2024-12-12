@@ -25,7 +25,7 @@ export default function LoginSignup() {
       if (isLogin) {
         const login_role = await login(email, password);
         console.log(login_role)
-        if (login_role == "patient"){
+        if (login_role === "patient"){
           navigate("/dashboard")
         }
         else{
@@ -37,7 +37,7 @@ export default function LoginSignup() {
         }
         await register({ name, email, password, role });
         console.log("Sign up successful");
-        if(role == "patient"){
+        if(role === "patient"){
           navigate("/dashboard"); // Navigate to dashboard on successful login
           }else{
             navigate("/doctor-onboard")

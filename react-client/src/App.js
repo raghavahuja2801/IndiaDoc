@@ -1,4 +1,5 @@
 import React from "react";
+import { Magnet } from "lucide-react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import LoginSignup from "./components/Auth";
