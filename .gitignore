@@ -1,4 +1,4 @@
 node_modules
 client/node_modules
 server/.env
-react-client/firebase.js
+react-client/src/firebase.js
