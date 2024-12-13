@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 export default function Dashboard() {

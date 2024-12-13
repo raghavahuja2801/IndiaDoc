@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../context/AuthContext"

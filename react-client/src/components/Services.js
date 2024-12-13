@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import { Stethoscope, Pill, MessageCircle } from "lucide-react"; // Using only icons here
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 const ServicesPage = () => {

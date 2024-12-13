@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 import {db} from "../firebase"; // Import the Firebase database
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 export default function PatientAuth() {
