@@ -49,7 +49,7 @@ export default function Navbar() {
         {currentUser ? ( // If user is logged in, show welcome message and logout button
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">
-              Welcome, {userProfile.name}!
+              Welcome, {userProfile?.name}!
             </span>
             <button
               onClick={handleLogout}
