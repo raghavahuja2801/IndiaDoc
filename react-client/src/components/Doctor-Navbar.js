@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Import the Auth context
 
 export default function DoctorNavbar() {
-  const { user, logout } = useAuth(); // Access the user state and logout function
+  const { currentUser,userProfile,  logout } = useAuth(); // Access the user state and logout function
   const navigate = useNavigate(); // Use navigate for programmatic routing
 
   const handleLogout = () => {
@@ -25,7 +25,7 @@ export default function DoctorNavbar() {
 
 
         {/* Conditional User-Specific Links */}
-        {user ? (
+        {currentUser ? (
           <>
             <Link
               to="/dashboard"
@@ -53,7 +53,7 @@ export default function DoctorNavbar() {
             </Link>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-600">
-                Welcome, {user.name}!
+                Welcome, {userProfile?.name}!
               </span>
               <button
                 onClick={handleLogout}
