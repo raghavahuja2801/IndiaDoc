@@ -3,19 +3,21 @@ import { Link} from "react-router-dom";
 import { Calendar, Clock } from 'lucide-react'
 import Footer from './Footer'
 import DoctorNavbar from './Doctor-Navbar';
+import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
+import {db} from "../firebase"; // Import the Firebase database
+import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 
 export default function DoctorOnboarding() {
   const [selectedDays, setSelectedDays] = useState([])
   const [availableHours, setAvailableHours] = useState([])
+  const { currentUser } = useAuth(); // Access Auth Context functions
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
     phone: '',
     specialization: '',
     experience: '',
     license: '',
-    bio: ''
+    bio: '',
+    status: 'pending'
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -47,11 +49,14 @@ export default function DoctorOnboarding() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically handle the form submission
     console.log('Form submitted', { ...formData, selectedDays, availableHours })
     alert('Profile information submitted successfully!')
+    await setDoc(doc(db, "doctor_data", currentUser.uid), {
+      ...formData, selectedDays, availableHours
+            }, { merge: true });
   }
 
   return (
@@ -63,44 +68,6 @@ export default function DoctorOnboarding() {
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-green-700">Personal Information</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input
