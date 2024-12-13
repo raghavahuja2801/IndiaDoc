@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext"; // Import the Auth context
+import { useAuth } from "../context/AuthContext"; // Import the Auth context
 
 export default function Navbar() {
   const { user, logout } = useAuth(); // Access the user state and logout function

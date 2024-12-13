@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { useAuth } from "../context/authContext"; // Import the useAuth hook
+import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
+import {db} from "../firebase"; // Import the Firebase database
+import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function LoginSignup() {
-  const { login, register, user } = useAuth(); // Access Auth Context functions
+  const { login, signup, user } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,25 +25,21 @@ export default function LoginSignup() {
 
     try {
       if (isLogin) {
-        const login_role = await login(email, password);
-        console.log(login_role)
-        if (login_role === "patient"){
-          navigate("/dashboard")
-        }
-        else{
-          navigate("/doctor-dashboard")
-        }
-      } else {
+        const userCredential = await login(email, password);
+        navigate("/dashboard"); // Navigate to dashboard on successful login
+      } else { //this part is for sign up
         if (password !== confirmPassword) {
           return;
         }
-        await register({ name, email, password, role });
-        console.log("Sign up successful");
-        if(role === "patient"){
-          navigate("/dashboard"); // Navigate to dashboard on successful login
-          }else{
-            navigate("/doctor-onboard")
-          }
+        const userCredential = await signup(email, password);
+        const user = userCredential.user;
+        console.log("Sign up successful",user.uid);
+        await setDoc(doc(db, "user_data", user.uid), {
+          name,
+          email,
+          role,
+        });
+        navigate("/dashboard"); // Navigate to dashboard on successful signup
       }
       
     } catch (err) {
