@@ -1,6 +1,6 @@
 import React from "react";
 // Import your Navbar and Footer components here
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 export default function AboutPage() {

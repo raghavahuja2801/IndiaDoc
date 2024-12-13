@@ -1,14 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Import the Auth context
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { user, logout } = useAuth(); // Access the user state and logout function
-  const navigate = useNavigate(); // Use navigate for programmatic routing
+  const { currentUser,userProfile, logout } = useAuth(); // Access Auth Context functions and state
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Call the logout function
-    navigate("/"); // Redirect to home after logout
+    logout();
+    navigate("/");
   };
 
   return (
@@ -46,10 +46,10 @@ export default function Navbar() {
         </Link>
 
         {/* Conditional Login/Logout Button */}
-        {user ? (
+        {currentUser ? ( // If user is logged in, show welcome message and logout button
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">
-              Welcome, {user.name}!
+              Welcome, {userProfile.name}!
             </span>
             <button
               onClick={handleLogout}
