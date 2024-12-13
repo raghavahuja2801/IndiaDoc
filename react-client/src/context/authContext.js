@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
       } else {
         setCurrentUser(null); // Clear the user state on logout
         setUserProfile(null);
-        setLoading(false);
+        setLoading(false);// wait for the loading to finish before showing the login screen
       }
     });
     
