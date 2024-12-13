@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 import {db} from "../firebase"; // Import the Firebase database
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
-export default function LoginSignup() {
+export default function PatientAuth() {
   const { login, signup, user } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
