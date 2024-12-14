@@ -27,10 +27,11 @@ export default function DoctorAuth() {
         const userCredential = await login(email, password);
         if(userProfile?.status === "approved"){
           navigate("/doctor-dashboard"); // Navigate to dashboard on successful login
-          logout();
+          
         }
         else{
           alert("Your account is not approved yet");
+          logout();
         }
         }catch(err){
           console.error("Authentication error:", err);
