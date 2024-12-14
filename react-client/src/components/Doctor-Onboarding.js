@@ -31,6 +31,7 @@ export default function DoctorOnboarding() {
     bio: "",
     status: "pending",
     degree: null, // For file input
+    profileImage: null, // For profile image file
   });
 
   const [selectedSlots, setSelectedSlots] = useState({});
@@ -83,32 +84,52 @@ export default function DoctorOnboarding() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       let degreeUrl = null;
-  
+      let profileImageUrl = null;
+
       // Check if the degree file is present in formData
       if (formData.degree) {
-        const fileRef = ref(storage, `medical_degrees/${currentUser.uid}/${formData.degree.name}`);
+        const fileRef = ref(
+          storage,
+          `medical_degrees/${currentUser.uid}/${formData.degree.name}`
+        );
         // Upload the file to Firebase Storage
         const snapshot = await uploadBytes(fileRef, formData.degree);
         // Get the file's download URL
         degreeUrl = await getDownloadURL(snapshot.ref);
       }
-  
+
+      // Upload profile image if present
+      if (formData.profileImage) {
+        const profileImageRef = ref(
+          storage,
+          `doctor_profile_images/${currentUser.uid}/${formData.profileImage.name}`
+        );
+        const profileImageSnapshot = await uploadBytes(
+          profileImageRef,
+          formData.profileImage
+        );
+        profileImageUrl = await getDownloadURL(profileImageSnapshot.ref);
+      }
+
       // Add the download URL to the form data
       const doctorData = {
         ...formData,
         degree: degreeUrl, // Include the download URL
+        profileImage: profileImageUrl,
         selectedSlots,
       };
-  
+
       // Save the form data and file URL to Firestore
       await setDoc(doc(db, "doctor_data", currentUser.uid), doctorData, {
         merge: true,
       });
-  
-      alert("Thank You for completing your profile!, You will be notified once your profile is approved");
+
+      alert(
+        "Thank You for completing your profile!, You will be notified once your profile is approved"
+      );
       console.log("Form submitted successfully", doctorData);
       logout(); // Log out the user after submitting the form
       navigate("/"); // Redirect to the home  page
@@ -117,7 +138,6 @@ export default function DoctorOnboarding() {
       alert("Failed to submit the form. Please try again.");
     }
   };
-  
 
   const timeSlots = Array.from(
     { length: (END_HOUR - START_HOUR) * (60 / SLOT_DURATION) },
@@ -165,6 +185,22 @@ export default function DoctorOnboarding() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                   value={formData.phone}
                   onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="profileImage"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Upload Profile Image
+                </label>
+                <input
+                  type="file"
+                  id="profileImage"
+                  name="profileImage"
+                  accept="image/*"
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                  onChange={handleFileChange}
                 />
               </div>
             </div>
