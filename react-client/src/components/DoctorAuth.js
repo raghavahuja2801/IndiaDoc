@@ -7,7 +7,7 @@ import DoctorNavbar from "./Doctor-Navbar";
 import Footer from "./Footer";
 
 export default function DoctorAuth() {
-  const { login, signup, userProfile } = useAuth(); // Access Auth Context functions
+  const { login, signup, userProfile, logout } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,9 +27,11 @@ export default function DoctorAuth() {
         const userCredential = await login(email, password);
         if(userProfile?.status === "approved"){
           navigate("/doctor-dashboard"); // Navigate to dashboard on successful login
+          
         }
         else{
           alert("Your account is not approved yet");
+          logout();
         }
         }catch(err){
           console.error("Authentication error:", err);
