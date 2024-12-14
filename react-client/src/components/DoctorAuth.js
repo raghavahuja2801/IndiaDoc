@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 import {db} from "../firebase"; // Import the Firebase database
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
-import Navbar from "./PatientNavbar";
+import DoctorNavbar from "./Doctor-Navbar";
 import Footer from "./Footer";
 
 export default function DoctorAuth() {
@@ -60,7 +60,7 @@ export default function DoctorAuth() {
 
     return (
       <div className="flex flex-col min-h-screen bg-white">
-        <Navbar />
+        <DoctorNavbar />
         <main className="flex-1 flex items-center justify-center bg-green-50 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
             <div>

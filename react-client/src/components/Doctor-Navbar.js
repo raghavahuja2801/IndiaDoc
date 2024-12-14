@@ -65,7 +65,7 @@ export default function DoctorNavbar() {
           </>
         ) : (
           <Link
-            to="/auth"
+            to="/doctor-auth"
             className="text-sm font-medium hover:text-orange-500 transition-colors"
           >
             Log In
