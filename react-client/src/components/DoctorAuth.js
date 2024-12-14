@@ -6,8 +6,8 @@ import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
-export default function PatientAuth() {
-  const { login, signup, user } = useAuth(); // Access Auth Context functions
+export default function DoctorAuth() {
+  const { login, signup, userProfile } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +25,12 @@ export default function PatientAuth() {
       if (isLogin) {
         try{
         const userCredential = await login(email, password);
-        navigate("/dashboard"); // Navigate to dashboard on successful login
+        if(userProfile?.status === "approved"){
+          navigate("/doctor-dashboard"); // Navigate to dashboard on successful login
+        }
+        else{
+          alert("Your account is not approved yet");
+        }
         }catch(err){
           console.error("Authentication error:", err);
           alert("Authentication error:", err.me);
@@ -40,11 +45,11 @@ export default function PatientAuth() {
         const userCredential = await signup(email, password);
         const user = userCredential.user;
         console.log("Sign up successful",user.uid);
-        await setDoc(doc(db, "user_data", user.uid), {
+        await setDoc(doc(db, "doctor_data", user.uid), {
           name,
           email,
                 });
-        navigate("/dashboard"); // Navigate to dashboard on successful signup
+        navigate("/doctor-onboard"); // Navigate to dashboard on successful signup
               }catch(err){
           console.error("Authentication error:", err);
           alert("Authentication error:", err);
@@ -53,9 +58,6 @@ export default function PatientAuth() {
       
   };
 
-  if (user) {
-    navigate("/dashboard");
-  } else {
     return (
       <div className="flex flex-col min-h-screen bg-white">
         <Navbar />
@@ -166,5 +168,4 @@ export default function PatientAuth() {
         <Footer />
       </div>
     );
-  }
 }

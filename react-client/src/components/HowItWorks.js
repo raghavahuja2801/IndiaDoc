@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Stethoscope, Globe, Pill, Video, Calendar, CreditCard } from "lucide-react";
-import Navbar from "./Navbar";
+import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 export default function HowItWorks() {
