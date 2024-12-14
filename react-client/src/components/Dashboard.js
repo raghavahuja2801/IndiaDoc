@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
+import { db } from "../firebase";
+import { collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 
 export default function Dashboard() {
   const [specialization, setSpecialization] = useState(""); // Selected specialization
@@ -22,31 +23,28 @@ export default function Dashboard() {
       }
 
       try {
-        // Retrieve the token from localStorage
-        const token = localStorage.getItem("token");
-
-        // Make the GET request with token in the Authorization header
-        const response = await axios.get(
-          "http://localhost:5001/api/doctors/specialization",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Include token in header
-            },
-            params: { specialization }, // Pass specialization as query parameter
-          }
+        // Firestore query to fetch doctors by specialization
+        const doctorsQuery = query(
+          collection(db, "doctor_data"),
+          where("specialization", "==", specialization)
         );
-        setDoctors(response.data); // Update doctors list
+        const querySnapshot = await getDocs(doctorsQuery);
+
+        const doctorsList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setDoctors(doctorsList); // Update doctors list
         setError(null); // Clear any errors
-        console.log("Doctors:", response.data);
       } catch (err) {
         setError("Failed to fetch doctors. Please try again.");
-        console.error(err);
         setDoctors([]); // Reset doctors list on error
       }
     };
 
     fetchDoctors();
-  }, [specialization]); // Re-fetch doctors whenever the specialization changes
+  }, [specialization]);
 
   const handleBooking = async () => {
     if (!selectedDoctor || !selectedTimeSlot) {
@@ -55,32 +53,23 @@ export default function Dashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token"); // Retrieve token from local storage
-
       // Construct the appointment data
       const appointmentData = {
-        patient: user._id, // Replace with the logged-in user's ID
-        doctor: selectedDoctor,
-        date: selectedTimeSlot, // Assuming selectedTimeSlot contains the date and time
+        patientId: user?.uid,
+        doctorId: selectedDoctor,
+        timeSlot: selectedTimeSlot,
       };
 
-      // Send POST request to create an appointment
-      const response = await axios.post(
-        "http://localhost:5001/api/appointments",
-        appointmentData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add Authorization header with the token
-          },
-        }
+      // Save appointment to Firestore
+      await setDoc(
+        doc(db, "appointments", `${user.uid}_${selectedDoctor}`),
+        appointmentData
       );
 
-      setSuccessMessage(response.data.message); // Display success message
+      setSuccessMessage("Appointment booked successfully!");
       setError(null); // Clear any errors
-      console.log("Appointment created:", response.data.appointment);
     } catch (err) {
       setError("Failed to book the appointment. Please try again."); // Handle errors
-      console.error(err);
     }
   };
 
@@ -93,7 +82,6 @@ export default function Dashboard() {
             Doctor Dashboard
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Booking Section */}
             <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-2xl font-semibold text-green-700 mb-4">
                 Book a Consultation
@@ -114,11 +102,11 @@ export default function Dashboard() {
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
                 >
                   <option value="">Choose a specialization</option>
-                  <option value="Cardiology">Cardiology</option>
-                  <option value="Dermatologist">Dermatology</option>
-                  <option value="Neurology">Neurology</option>
-                  <option value="Pediatrics">Pediatrics</option>
-                  <option value="General Practitioner">
+                  <option value="cardiology">Cardiology</option>
+                  <option value="dermatology">Dermatology</option>
+                  <option value="neurology">Neurology</option>
+                  <option value="pediatrics">Pediatrics</option>
+                  <option value="general">
                     General Practitioner
                   </option>
                 </select>
@@ -131,55 +119,84 @@ export default function Dashboard() {
                   <p className="text-green-500">{successMessage}</p>
                 )}
                 {doctors.length > 0 ? (
-                  <ul className="divide-y divide-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {doctors.map((doctor) => (
-                      <li key={doctor._id} className="py-4">
-                        <p className="text-lg font-semibold text-green-700">
-                          {doctor.user.name} ({doctor.specialization})
+                      <div
+                        key={doctor.id}
+                        className="bg-white shadow rounded-lg p-4 border"
+                      >
+                        <img
+                          src={doctor.profileImage}
+                          alt={`${doctor.name}'s Profile`}
+                          className="w-full h-40 object-cover rounded-md mb-4"
+                        />
+                        <h3 className="text-lg font-semibold text-green-700">
+                          {doctor.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Specialization: {doctor.specialization}
                         </p>
-                        <p className="text-sm text-gray-600">
-                          {doctor.user.email}
+                        <p className="text-sm text-gray-500">
+                          Experience: {doctor.experience} years
                         </p>
-                        <label
-                          htmlFor={`doctor-${doctor._id}`}
-                          className="block text-sm font-medium text-gray-700 mt-2"
+                        <p className="text-sm text-gray-500">
+                          License: {doctor.license}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Bio: {doctor.bio}
+                        </p>
+                        <a
+                          href={doctor.degree}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-600 hover:underline"
                         >
-                          Select Time Slot
-                        </label>
-                        <select
-                          id={`doctor-${doctor._id}`}
-                          onChange={(e) => {
-                            setSelectedDoctor(doctor._id);
-                            setSelectedTimeSlot(e.target.value);
-                          }}
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                          View Degree
+                        </a>
+                        <div className="mt-4">
+                          <label
+                            htmlFor={`doctor-${doctor.id}`}
+                            className="block text-sm font-medium text-gray-700"
+                          >
+                            Select Time Slot
+                          </label>
+                          <select
+                            id={`doctor-${doctor.id}`}
+                            onChange={(e) => {
+                              setSelectedDoctor(doctor.id);
+                              setSelectedTimeSlot(e.target.value);
+                            }}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                          >
+                            <option value="">Choose a time slot</option>
+                            {Object.entries(doctor.selectedSlots).map(
+                              ([day, slots]) =>
+                                slots.map((slot, index) => (
+                                  <option
+                                    key={`${day}-${index}`}
+                                    value={`${day} ${slot.start}-${slot.end}`}
+                                  >
+                                    {day} {slot.start} - {slot.end}
+                                  </option>
+                                ))
+                            )}
+                          </select>
+                        </div>
+                        <button
+                          onClick={handleBooking}
+                          className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                         >
-                          <option value="">Choose a time slot</option>
-                          {doctor.availableHours.map((slot) => (
-                            <option
-                              key={slot._id}
-                              value={`${slot.start}-${slot.end}`}
-                            >
-                              {slot.start} - {slot.end}
-                            </option>
-                          ))}
-                        </select>
-                      </li>
+                          Book Appointment
+                        </button>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 ) : (
                   <p className="text-gray-500">
                     No doctors available for the selected specialization.
                   </p>
                 )}
               </div>
-
-              <button
-                onClick={handleBooking}
-                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Confirm Appointment
-              </button>
             </div>
 
             {/* Sidebar Section */}
