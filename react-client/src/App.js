@@ -10,6 +10,7 @@ import DoctorOnboarding from "./components/Doctor-Onboarding";
 import About from "./components/About";
 import ContactPage from "./components/ContactPage";
 import DoctorAuth from "./components/DoctorAuth";
+import MessagesPage from './components/messages-page';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/messages" element={<MessagesPage />} />
       </Routes>
     </Router>
   );
