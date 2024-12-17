@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { currentUser,userProfile, logout } = useAuth(); // Access Auth Context functions and state
+  const { currentUser, userProfile, logout } = useAuth(); // Access Auth Context functions and state
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -38,6 +38,14 @@ export default function Navbar() {
         >
           About Us
         </Link>
+        {currentUser && ( // Only show Messages link if user is logged in
+          <Link
+            to="/messages"
+            className="text-sm font-medium hover:text-orange-500 transition-colors"
+          >
+            Messages
+          </Link>
+        )}
         <Link
           to="/contact"
           className="text-sm font-medium hover:text-orange-500 transition-colors"
