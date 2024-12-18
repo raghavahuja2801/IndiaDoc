@@ -5,6 +5,7 @@ import {db} from "../firebase"; // Import the Firebase database
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import DoctorNavbar from "./Doctor-Navbar";
 import Footer from "./Footer";
+import { serverTimestamp } from "firebase/firestore";
 
 export default function DoctorAuth() {
   const { login, signup, userProfile, logout } = useAuth(); // Access Auth Context functions
@@ -26,7 +27,7 @@ export default function DoctorAuth() {
         try{
         const userCredential = await login(email, password);
         if(userProfile?.status === "approved"){
-          navigate("/doctor-dashboard"); // Navigate to dashboard on successful login
+          navigate("/messages"); // Navigate to dashboard on successful login
           
         }
         else{
@@ -52,6 +53,7 @@ export default function DoctorAuth() {
           email,
           type: "doctor",
           status: "pending",
+          createdAt: serverTimestamp(),
                 });
         navigate("/doctor-onboard"); // Navigate to dashboard on successful signup
               }catch(err){
