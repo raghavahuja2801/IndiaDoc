@@ -50,6 +50,8 @@ export default function DoctorAuth() {
         await setDoc(doc(db, "doctor_data", user.uid), {
           name,
           email,
+          type: "doctor",
+          status: "pending",
                 });
         navigate("/doctor-onboard"); // Navigate to dashboard on successful signup
               }catch(err){

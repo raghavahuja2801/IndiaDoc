@@ -42,6 +42,7 @@ export default function PatientAuth() {
         await setDoc(doc(db, "user_data", user.uid), {
           name,
           email,
+          type: "patient",
                 });
         navigate("/dashboard"); // Navigate to dashboard on successful signup
               }catch(err){
