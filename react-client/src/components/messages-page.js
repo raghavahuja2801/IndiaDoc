@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
+
+//Component imports 
 import ConversationsList from './chatlist';
 import ChatWindow from './chat';
 import PatientNavbar from './PatientNavbar';
@@ -14,10 +16,10 @@ const MessagesPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [availableDoctors, setAvailableDoctors] = useState([]);
-  const { role } = useAuth();
+  const { userProfile } = useAuth();
 
   // Determine which navbar to show based on user type
-  const isDoctor = role === 'doctor';
+  const isDoctor = userProfile?.type === "doctor";
   const Navbar = isDoctor ? DoctorNavbar : PatientNavbar;
 
   // Fetch all available doctors

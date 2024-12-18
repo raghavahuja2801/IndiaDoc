@@ -29,8 +29,10 @@ const ChatWindow = ({ recipientId, recipientName }) => {
   }, [messages]);
 
   // Create or fetch conversation
+  //Ensures a conversation exists between the logged-in user and the recipient. 
   useEffect(() => {
     const getConversation = async () => {
+      // Queries Firestore for a conversation that includes both the current user and the recipient.
       const q = query(
         collection(db, 'conversations'),
         where('participants', 'array-contains', currentUser.uid)
@@ -45,6 +47,7 @@ const ChatWindow = ({ recipientId, recipientName }) => {
         });
 
         if (existingConversation) {
+         //If a conversation exists with the recipient, its ID is stored in conversationId
           setConversationId(existingConversation);
         } else {
           // Create new conversation if not found
@@ -66,16 +69,18 @@ const ChatWindow = ({ recipientId, recipientName }) => {
     }
   }, [currentUser, recipientId]);
 
-  // Fetch messages in current conversation
+  // Fetch messages in current conversation in REAL TIME 
   useEffect(() => {
     if (!conversationId) return;
 
+    //Filters messages by the current conversationId and sorts them by timestamp.
     const q = query(
       collection(db, 'messages'),
       where('conversationId', '==', conversationId),
       orderBy('timestamp', 'asc')
     );
 
+    // Updates the messages state with the latest messages in the conversation.
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData = [];
       querySnapshot.forEach((doc) => {

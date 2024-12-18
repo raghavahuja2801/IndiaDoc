@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
-import {db} from "../firebase"; // Import the Firebase database
+import { db } from "../firebase"; // Import the Firebase database
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
 import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
+import { serverTimestamp } from "firebase/firestore";
 
 export default function PatientAuth() {
   const { login, signup, currentUser } = useAuth(); // Access Auth Context functions
@@ -22,34 +23,35 @@ export default function PatientAuth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-      if (isLogin) {
-        try{
+    if (isLogin) {
+      try {
         await login(email, password);
         navigate("/dashboard"); // Navigate to dashboard on successful login
-        }catch(err){
-          console.error("Authentication error:", err);
-          alert("Authentication error:", err.me);
-        }
-
-      } else { //this part is for sign up
-        try{
+      } catch (err) {
+        console.error("Authentication error:", err);
+        alert("Authentication error:", err.me);
+      }
+    } else {
+      //this part is for sign up
+      try {
         if (password !== confirmPassword) {
           alert("Passwords do not match");
           return;
         }
-        const userCredentials = await signup(email, password, name );
+        const userCredentials = await signup(email, password, name);
         const user = userCredentials.user;
         await setDoc(doc(db, "user_data", user.uid), {
           name,
           email,
-                });
+          type: "patient",
+          createdAt: serverTimestamp(),
+        });
         navigate("/dashboard"); // Navigate to dashboard on successful signup
-              }catch(err){
-          console.error("Sign Up error:", err);
-          alert("Authentication error:", err);
-              }
+      } catch (err) {
+        console.error("Sign Up error:", err);
+        alert("Authentication error:", err);
       }
-      
+    }
   };
 
   if (currentUser) {
