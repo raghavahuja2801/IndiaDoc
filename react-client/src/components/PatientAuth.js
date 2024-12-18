@@ -24,7 +24,7 @@ export default function PatientAuth() {
 
       if (isLogin) {
         try{
-        const userCredential = await login(email, password);
+        await login(email, password);
         navigate("/dashboard"); // Navigate to dashboard on successful login
         }catch(err){
           console.error("Authentication error:", err);
@@ -37,7 +37,7 @@ export default function PatientAuth() {
           alert("Passwords do not match");
           return;
         }
-        const userCredential = await signup(email, password);
+        const userCredential = await signup(email, password, name, null);
         const user = userCredential.user;
         console.log("Sign up successful",user.uid);
         await setDoc(doc(db, "user_data", user.uid), {

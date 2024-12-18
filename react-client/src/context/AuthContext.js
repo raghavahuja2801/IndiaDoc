@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
 import { onSnapshot, doc, getDoc } from 'firebase/firestore';
 
@@ -54,8 +55,11 @@ export function AuthProvider({ children }) {
     
   }, []);
 
-  const signup = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const signup = async (email, password, name, photoURL) => {
+    const userCredentials = createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredentials.user;
+    if (name) await updateProfile(user, { displayName: name });
+    if (photoURL) await updateProfile(user, { photoURL: photoURL });
   };
 
   const login = (email, password) => {
