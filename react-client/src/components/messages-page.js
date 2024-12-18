@@ -14,10 +14,10 @@ const MessagesPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [availableDoctors, setAvailableDoctors] = useState([]);
-  const { userProfile } = useAuth();
+  const { role } = useAuth();
 
   // Determine which navbar to show based on user type
-  const isDoctor = userProfile?.type === 'doctor';
+  const isDoctor = role === 'doctor';
   const Navbar = isDoctor ? DoctorNavbar : PatientNavbar;
 
   // Fetch all available doctors
