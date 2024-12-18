@@ -7,7 +7,7 @@ import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 
 export default function PatientAuth() {
-  const { login, signup, user } = useAuth(); // Access Auth Context functions
+  const { login, signup, currentUser } = useAuth(); // Access Auth Context functions
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,7 +24,7 @@ export default function PatientAuth() {
 
       if (isLogin) {
         try{
-        const userCredential = await login(email, password);
+        await login(email, password);
         navigate("/dashboard"); // Navigate to dashboard on successful login
         }catch(err){
           console.error("Authentication error:", err);
@@ -37,23 +37,22 @@ export default function PatientAuth() {
           alert("Passwords do not match");
           return;
         }
-        const userCredential = await signup(email, password);
-        const user = userCredential.user;
-        console.log("Sign up successful",user.uid);
+        const userCredentials = await signup(email, password, name, "");
+        const user = userCredentials.user;
         await setDoc(doc(db, "user_data", user.uid), {
           name,
           email,
                 });
         navigate("/dashboard"); // Navigate to dashboard on successful signup
               }catch(err){
-          console.error("Authentication error:", err);
+          console.error("Sign Up error:", err);
           alert("Authentication error:", err);
               }
       }
       
   };
 
-  if (user) {
+  if (currentUser) {
     navigate("/dashboard");
   } else {
     return (

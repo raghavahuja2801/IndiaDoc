@@ -12,7 +12,8 @@ export default function Dashboard() {
   const [selectedDoctor, setSelectedDoctor] = useState(""); // Selected doctor
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(""); // Selected time slot
   const [successMessage, setSuccessMessage] = useState(""); // Appointment confirmation message
-  const { user } = useAuth(); // Access user details from Auth Context
+  const { currentUser } = useAuth(); // Access user details from Auth Context
+
 
   // Fetch doctors based on specialization
   useEffect(() => {
@@ -55,14 +56,14 @@ export default function Dashboard() {
     try {
       // Construct the appointment data
       const appointmentData = {
-        patientId: user?.uid,
+        patientId: currentUser?.uid,
         doctorId: selectedDoctor,
         timeSlot: selectedTimeSlot,
       };
 
       // Save appointment to Firestore
       await setDoc(
-        doc(db, "appointments", `${user.uid}_${selectedDoctor}`),
+        doc(db, "appointments", `${currentUser.uid}_${selectedDoctor}`),
         appointmentData
       );
 
