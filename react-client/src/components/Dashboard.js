@@ -13,7 +13,6 @@ export default function Dashboard() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(""); // Selected time slot
   const [successMessage, setSuccessMessage] = useState(""); // Appointment confirmation message
   const { currentUser } = useAuth(); // Access user details from Auth Context
-  console.log(currentUser);
 
 
   // Fetch doctors based on specialization

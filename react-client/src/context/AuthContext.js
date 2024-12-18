@@ -56,10 +56,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signup = async (email, password, name, photoURL) => {
-    const userCredentials = createUserWithEmailAndPassword(auth, email, password);
+    const userCredentials = await  createUserWithEmailAndPassword(auth, email, password);
     const user = userCredentials.user;
-    if (name) await updateProfile(user, { displayName: name });
-    if (photoURL) await updateProfile(user, { photoURL: photoURL });
+    if (name) {
+      await updateProfile(user, { displayName: name });
+    }
+    if (photoURL) {
+      await updateProfile(user, { photoURL: photoURL });
+    }
+    return userCredentials;
   };
 
   const login = (email, password) => {

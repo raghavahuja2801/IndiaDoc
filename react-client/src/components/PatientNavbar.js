@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { currentUser, userProfile, logout } = useAuth(); // Access Auth Context functions and state
+  const { currentUser, logout } = useAuth(); // Access Auth Context functions and state
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -78,7 +78,7 @@ export default function Navbar() {
     {currentUser ? (
       <>
         <span className="text-sm font-medium text-gray-600">
-          Welcome, {userProfile?.name}!
+          Welcome, {currentUser?.displayName}!
         </span>
         <button
           onClick={handleLogout}
