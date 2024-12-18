@@ -37,7 +37,7 @@ export default function PatientAuth() {
           alert("Passwords do not match");
           return;
         }
-        const userCredentials = await signup(email, password, name, "");
+        const userCredentials = await signup(email, password, name );
         const user = userCredentials.user;
         await setDoc(doc(db, "user_data", user.uid), {
           name,

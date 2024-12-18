@@ -3,7 +3,14 @@ import { useAuth } from "../context/AuthContext";
 import Navbar from "./PatientNavbar";
 import Footer from "./Footer";
 import { db } from "../firebase";
-import { collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 
 export default function Dashboard() {
   const [specialization, setSpecialization] = useState(""); // Selected specialization
@@ -13,7 +20,6 @@ export default function Dashboard() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(""); // Selected time slot
   const [successMessage, setSuccessMessage] = useState(""); // Appointment confirmation message
   const { currentUser } = useAuth(); // Access user details from Auth Context
-
 
   // Fetch doctors based on specialization
   useEffect(() => {
@@ -107,9 +113,7 @@ export default function Dashboard() {
                   <option value="dermatology">Dermatology</option>
                   <option value="neurology">Neurology</option>
                   <option value="pediatrics">Pediatrics</option>
-                  <option value="general">
-                    General Practitioner
-                  </option>
+                  <option value="general">General Practitioner</option>
                 </select>
               </div>
 
