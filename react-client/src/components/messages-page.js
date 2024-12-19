@@ -175,7 +175,7 @@ const MessagesPage = () => {
         {showNewChat && <NewChatDialog />}
       </main>
 
-      <Footer />
+    <Footer />
     </div>
   );
 };
