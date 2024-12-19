@@ -1,16 +1,18 @@
+// ChatWindow.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
   onSnapshot,
   serverTimestamp,
   doc,
-  updateDoc
+  updateDoc,
+  getDocs
 } from 'firebase/firestore';
 
 const ChatWindow = ({ recipientId, recipientName }) => {
@@ -20,6 +22,7 @@ const ChatWindow = ({ recipientId, recipientName }) => {
   const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
 
+  // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -28,88 +31,99 @@ const ChatWindow = ({ recipientId, recipientName }) => {
     scrollToBottom();
   }, [messages]);
 
-  // Create or fetch conversation
-  //Ensures a conversation exists between the logged-in user and the recipient. 
+  // Find or create conversation
   useEffect(() => {
-    const getConversation = async () => {
-      // Queries Firestore for a conversation that includes both the current user and the recipient.
-      const q = query(
-        collection(db, 'conversations'),
-        where('participants', 'array-contains', currentUser.uid)
-      );
+    const findOrCreateConversation = async () => {
+      if (!currentUser || !recipientId) return;
 
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      try {
+        // First, check for existing conversations
+        const conversationsRef = collection(db, 'conversations');
+        const q = query(
+          conversationsRef,
+          where('participants', 'array-contains', currentUser.uid)
+        );
+        
+        const querySnapshot = await getDocs(q);
         let existingConversation = null;
+
         querySnapshot.forEach((doc) => {
-          if (doc.data().participants.includes(recipientId)) {
-            existingConversation = doc.id;
+          const data = doc.data();
+          if (data.participants.includes(recipientId)) {
+            existingConversation = { id: doc.id, ...data };
           }
         });
 
         if (existingConversation) {
-         //If a conversation exists with the recipient, its ID is stored in conversationId
-          setConversationId(existingConversation);
+          console.log('Found existing conversation:', existingConversation.id);
+          setConversationId(existingConversation.id);
         } else {
-          // Create new conversation if not found
-          const newConversation = await addDoc(collection(db, 'conversations'), {
+          // Create new conversation
+          const newConversationRef = await addDoc(conversationsRef, {
             participants: [currentUser.uid, recipientId],
             createdAt: serverTimestamp(),
             lastMessage: '',
-            updatedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
           });
-          setConversationId(newConversation.id);
+          console.log('Created new conversation:', newConversationRef.id);
+          setConversationId(newConversationRef.id);
         }
-      });
-
-      return () => unsubscribe();
+      } catch (error) {
+        console.error('Error finding/creating conversation:', error);
+      }
     };
 
-    if (currentUser && recipientId) {
-      getConversation();
-    }
+    findOrCreateConversation();
   }, [currentUser, recipientId]);
 
-  // Fetch messages in current conversation in REAL TIME 
+  // Listen for messages in current conversation
   useEffect(() => {
     if (!conversationId) return;
 
-    //Filters messages by the current conversationId and sorts them by timestamp.
+    console.log('Setting up messages listener for conversation:', conversationId);
+
     const q = query(
       collection(db, 'messages'),
       where('conversationId', '==', conversationId),
       orderBy('timestamp', 'asc')
     );
 
-    // Updates the messages state with the latest messages in the conversation.
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData = [];
       querySnapshot.forEach((doc) => {
         messagesData.push({ id: doc.id, ...doc.data() });
       });
+      console.log('Retrieved messages:', messagesData);
       setMessages(messagesData);
     });
 
     return () => unsubscribe();
   }, [conversationId]);
 
+  // Send message function
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !conversationId) return;
 
     try {
-      await addDoc(collection(db, 'messages'), {
+      console.log('Sending message in conversation:', conversationId);
+      
+      // Add message to messages collection
+      const messageRef = await addDoc(collection(db, 'messages'), {
         conversationId,
         sender: currentUser.uid,
         content: newMessage,
         timestamp: serverTimestamp(),
-        read: false,
+        read: false
       });
 
+      // Update conversation's last message
       await updateDoc(doc(db, 'conversations', conversationId), {
         lastMessage: newMessage,
-        updatedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
 
+      console.log('Message sent successfully:', messageRef.id);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -118,10 +132,12 @@ const ChatWindow = ({ recipientId, recipientName }) => {
 
   return (
     <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-md">
+      {/* Chat Header */}
       <div className="p-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-800">{recipientName}</h3>
       </div>
 
+      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
@@ -144,6 +160,7 @@ const ChatWindow = ({ recipientId, recipientName }) => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Message Input Form */}
       <form onSubmit={sendMessage} className="p-4 border-t border-gray-200">
         <div className="flex space-x-2">
           <input

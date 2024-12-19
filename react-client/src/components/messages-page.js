@@ -2,9 +2,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  where 
+} from 'firebase/firestore';
 
-//Component imports 
+// Component imports 
 import ConversationsList from './chatlist';
 import ChatWindow from './chat';
 import PatientNavbar from './PatientNavbar';
@@ -16,13 +21,13 @@ const MessagesPage = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
   const [availableDoctors, setAvailableDoctors] = useState([]);
-  const { userProfile } = useAuth();
+  const { userProfile, currentUser } = useAuth();  // Added currentUser
 
   // Determine which navbar to show based on user type
   const isDoctor = userProfile?.type === "doctor";
   const Navbar = isDoctor ? DoctorNavbar : PatientNavbar;
 
-  // Fetch all available doctors
+  // Function to fetch all available doctors
   const fetchAvailableDoctors = async () => {
     try {
       const doctorsSnapshot = await getDocs(collection(db, 'doctor_data'));
@@ -36,9 +41,40 @@ const MessagesPage = () => {
           });
         }
       });
+      console.log('Available doctors:', doctors);
       setAvailableDoctors(doctors);
     } catch (error) {
       console.error('Error fetching doctors:', error);
+    }
+  };
+
+  // Function to handle starting a new chat
+  const handleStartNewChat = async (doctor) => {
+    try {
+      // Check for existing conversation first
+      const conversationsRef = collection(db, 'conversations');
+      const q = query(
+        conversationsRef,
+        where('participants', 'array-contains', currentUser.uid)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      let existingConversation = false;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.participants.includes(doctor.id)) {
+          existingConversation = true;
+          setSelectedRecipient(doctor);
+        }
+      });
+
+      if (!existingConversation) {
+        setSelectedRecipient(doctor);
+      }
+      setShowNewChat(false);
+    } catch (error) {
+      console.error('Error starting new chat:', error);
     }
   };
 
@@ -61,10 +97,7 @@ const MessagesPage = () => {
             {availableDoctors.map(doctor => (
               <div
                 key={doctor.id}
-                onClick={() => {
-                  setSelectedRecipient(doctor);
-                  setShowNewChat(false);
-                }}
+                onClick={() => handleStartNewChat(doctor)}
                 className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -93,6 +126,7 @@ const MessagesPage = () => {
     </div>
   );
 
+  // Main component render
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
