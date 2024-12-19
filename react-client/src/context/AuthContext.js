@@ -15,7 +15,6 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
@@ -31,17 +30,14 @@ export function AuthProvider({ children }) {
           async (docSnapshot) => {
             if (docSnapshot.exists()) {
               setUserProfile(docSnapshot.data());
-              setRole("patient");
             } else {
               // If not found in user_data, check doctor_data
               const doctorSnapshot = await getDoc(doctorDocRef);
               if (doctorSnapshot.exists()) {
                 setUserProfile(doctorSnapshot.data());
-                setRole("doctor");
               } else {
                 // If not found in either, set null
                 setUserProfile(null);
-                setRole(null);
               }
             }
             setLoading(false);
@@ -53,14 +49,13 @@ export function AuthProvider({ children }) {
       } else {
         setCurrentUser(null); // Clear the user state on logout
         setUserProfile(null);
-        setRole(null);
         setLoading(false); // wait for the loading to finish before showing the login screen
       }
-    });
+    }, [currentUser]);
 
     // Clean up auth listener on unmount
     return () => unsubscribeAuth();
-  }, []);
+  }, [currentUser]);
 
   const signup = async (email, password, name, photoURL, role) => {
     const userCredentials = await createUserWithEmailAndPassword(
@@ -76,6 +71,8 @@ export function AuthProvider({ children }) {
   };
 
   const login = (email, password) => {
+    setLoading(true);
+    console.log("loading", loading);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
@@ -86,7 +83,6 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     userProfile,
-    role,
     signup,
     login,
     logout,
