@@ -24,7 +24,7 @@ export default function DoctorNavbar() {
         {currentUser ? (
           <>
             <Link
-              to="/dashboard"
+              to="/doctor-dashboard"
               className="text-sm font-medium hover:text-orange-500 transition-colors"
             >
               Dashboard
