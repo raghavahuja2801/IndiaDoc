@@ -26,10 +26,8 @@ export default function DoctorAuth() {
     if (isLogin) {
       try {
         await login(email, password);
-        console.log(loading);
         if (!loading) {
-          console.log(userProfile?.status);
-          if (userProfile.status === "approved") {
+          if (userProfile?.status === "approved") {
             navigate("/messages"); // Navigate to dashboard on successful login
 
           }
