@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "firebase": "^11.1.0",
     "gapi-script": "^1.2.0",
     "lucide-react": "^0.460.0",

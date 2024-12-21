@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import PatientAuth from "./components/PatientAuth";
-import HomePage from "./components/Dashboard";
+import Dashboard from "./components/Dashboard";
 import HowItWorks from "./components/HowItWorks";
 import Services from "./components/Services";
 import DoctorOnboarding from "./components/Doctor-Onboarding";
@@ -19,7 +19,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<PatientAuth />} />
         <Route path="/doctor-auth" element={<DoctorAuth />} />
-        <Route path="/dashboard" element={<HomePage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/services" element={<Services />} />
         <Route path="/doctor-onboard" element={<DoctorOnboarding />} />
