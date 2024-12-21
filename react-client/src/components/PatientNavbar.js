@@ -5,98 +5,135 @@ import { useAuth } from "../context/AuthContext";
 export default function Navbar() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false); // State to toggle the menu
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+
   return (
     <header className="px-4 lg:px-6 border-b border-gray-200">
-      <div className="h-16 flex items-center justify-between">
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-green-600">GlobalHealth</span>
-        </Link>
+      <div className="h-16 flex items-center">
+        {/* Logo - Fixed width */}
+        <div className="w-48">
+          <Link to="/" className="flex items-center">
+            <span className="text-2xl font-bold text-green-600">GlobalHealth</span>
+          </Link>
+        </div>
 
-        {/* Burger Menu for Mobile */}
-        <button
-          className="lg:hidden text-gray-600 focus:outline-none"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle Navigation"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16m-7 6h7"
-            />
-          </svg>
-        </button>
+        {/* Desktop Navigation - Fixed width center section */}
+        <div className="hidden lg:flex flex-1 justify-center">
+          <nav className="flex items-center space-x-8">
+            {!currentUser ? (
+              <>
+                <Link
+                  to="/how-it-works"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  How It Works
+                </Link>
+                <Link
+                  to="/services"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  Services
+                </Link>
+                <Link
+                  to="/about"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  About Us
+                </Link>
+                <Link
+                  to="/contact"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  Contact
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/messages"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  Messages
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/appointments"
+                  className="text-sm font-medium hover:text-orange-500 transition-colors whitespace-nowrap"
+                >
+                  Appointments
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex lg:items-center lg:space-x-6">
-          {!currentUser ? (
-            <>
-              <Link
-                to="/how-it-works"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
+        {/* Auth Section - Fixed width */}
+        <div className="hidden lg:flex w-48 justify-end">
+          {currentUser ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                Welcome, {currentUser?.displayName}!
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-medium text-red-600 hover:text-red-800 transition-colors"
               >
-                How It Works
-              </Link>
-              <Link
-                to="/services"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
-              >
-                Services
-              </Link>
-              <Link
-                to="/about"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
-              >
-                About Us
-              </Link>
-              <Link
-                to="/contact"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
-              >
-                Contact
-              </Link>
-            </>
+                Log Out
+              </button>
+            </div>
           ) : (
-            <>
+            <div className="flex items-center space-x-4">
               <Link
-                to="/messages"
+                to="/auth"
                 className="text-sm font-medium hover:text-orange-500 transition-colors"
               >
-                Messages
+                Patient Login
               </Link>
               <Link
-                to="/dashboard"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
+                to="/doctor-auth"
+                className="text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
               >
-                Dashboard
+                Doctor Login
               </Link>
-              <Link
-                to="/appointments"
-                className="text-sm font-medium hover:text-orange-500 transition-colors"
-              >
-                Appointments
-              </Link>
-            </>
+            </div>
           )}
-        </nav>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden ml-auto">
+          <button
+            className="text-gray-600 focus:outline-none"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Collapsible Mobile Menu */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden mt-2 flex flex-col items-center space-y-4 w-auto mx-auto bg-white p-4 rounded-lg shadow-md">
           <nav className="flex flex-col items-center space-y-2">
