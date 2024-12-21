@@ -10,6 +10,7 @@ import About from "./components/About";
 import ContactPage from "./components/ContactPage";
 import DoctorAuth from "./components/DoctorAuth";
 import MessagesPage from './components/messages-page';
+import DoctorProfile from './components/DoctorProfile';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/messages" element={<MessagesPage />} />
+        <Route path="Profile" element={<DoctorProfile />} />
       </Routes>
     </Router>
   );
