@@ -20,13 +20,16 @@ const ContactPage = () => {
     try {
       // Send form data to Formspree
       // Replace 'YOUR_FORM_ID' with your actual Formspree form ID
-      const response = await fetch("https://formspree.io/f/mvggpowg", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, message }),
-      });
+      const response = await fetch(
+        `https://formspree.io/f/${process.env.REACT_APP_FORMSPREE_FORM_ID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, message }),
+        }
+      );
 
       if (response.ok) {
         // Show success notification
